@@ -22,17 +22,17 @@ command). Older iOS uses a different pymobiledevice3 subcommand
 ## Setup
 
 ```
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
 ```
 
 ## CLI
 
 ```
-.venv/bin/python3 -m geo_spoofer.cli set-city "San Francisco"
-.venv/bin/python3 -m geo_spoofer.cli set-coords 37.7749 -122.4194
-.venv/bin/python3 -m geo_spoofer.cli drive --from "Golden Gate Bridge" --to "Fisherman's Wharf" --speed 30
-.venv/bin/python3 -m geo_spoofer.cli clear
+venv/bin/python3 -m geo_spoofer.cli set-city "San Francisco"
+venv/bin/python3 -m geo_spoofer.cli set-coords 37.7749 -122.4194
+venv/bin/python3 -m geo_spoofer.cli drive --from "Golden Gate Bridge" --to "Fisherman's Wharf" --speed 30
+venv/bin/python3 -m geo_spoofer.cli clear
 ```
 
 `set-city`, `set-coords`, and `drive` run in the foreground — Ctrl+C stops
@@ -41,17 +41,18 @@ and restores real GPS.
 ## GUI
 
 ```
-.venv/bin/python3 -m geo_spoofer.gui
+venv/bin/python3 -m geo_spoofer.gui
 ```
 
-A small window: set by city, set by coordinates, or drive a road route
+A small window: set by city, set by coordinates (or click "Pick on map..."
+to drop a pin on an interactive world map instead), or drive a road route
 between two places/coords (looked up via the free OSRM routing API).
 "Stop / Restore real GPS" cancels whichever is active.
 
 ## Tests
 
 ```
-.venv/bin/python3 test_core.py
+venv/bin/python3 test_core.py
 ```
 
 Covers the logic that doesn't need a phone (coordinate parsing, GPX

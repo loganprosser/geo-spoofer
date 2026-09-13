@@ -69,6 +69,20 @@ def clear_location() -> None:
     _run("clear")
 
 
+def pick_on_map() -> tuple[float, float] | None:
+    """Opens the interactive map picker and returns the clicked (lat, lon),
+    or None if the user cancelled/closed it. Runs in a subprocess: a native
+    webview needs its own main thread on macOS, which the GUI's Tkinter
+    mainloop already occupies."""
+    result = subprocess.run(
+        [sys.executable, "-m", "geo_spoofer.map_picker"], capture_output=True, text=True
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    lat_str, lon_str = result.stdout.strip().split(",")
+    return float(lat_str), float(lon_str)
+
+
 def geocode(place: str) -> tuple[float, float]:
     """Place name -> (lat, lon) via OpenStreetMap Nominatim."""
     url = "https://nominatim.openstreetmap.org/search?" + urllib.parse.urlencode(
