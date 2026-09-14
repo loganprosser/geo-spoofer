@@ -44,10 +44,18 @@ and restores real GPS.
 venv/bin/python3 -m geo_spoofer.gui
 ```
 
-A small window: set by city, set by coordinates (or click "Pick on map..."
-to drop a pin on an interactive world map instead), or drive a road route
-between two places/coords (looked up via the free OSRM routing API).
-"Stop / Restore real GPS" cancels whichever is active.
+A full-window map (dark, via free OSM/CARTO tiles). A floating panel lets
+you teleport to a place name/coordinates, or drive a road route between a
+"From" and "To" (free OSRM routing) — click the map to fill whichever field
+you last focused, like dropping a pin. Your approximate real location (free
+IP geolocation, city-level accuracy — there's no way to read the phone's
+actual GPS back) shows as a gray pin alongside the green "spoofed to" pin,
+so you can see the offset. "Stop / Restore real GPS" cancels whichever is
+active.
+
+No API keys, no billing accounts, no signup — every lookup (geocoding,
+routing, map tiles, approximate current location) uses a free, keyless
+service.
 
 ## Tests
 
@@ -58,3 +66,7 @@ venv/bin/python3 test_core.py
 Covers the logic that doesn't need a phone (coordinate parsing, GPX
 timing/pacing math). The actual USB/device calls need a real iPhone plugged
 in to verify.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

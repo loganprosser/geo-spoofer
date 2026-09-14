@@ -35,7 +35,7 @@ def cmd_set_coords(args: argparse.Namespace) -> None:
 
 
 def cmd_drive(args: argparse.Namespace) -> None:
-    proc = core.start_drive(args.start, args.end, args.speed)
+    proc, _points = core.start_drive(args.start, args.end, args.speed)
     _hold_until_interrupted(proc, f"Driving from {args.start!r} to {args.end!r} at {args.speed} km/h.")
 
 

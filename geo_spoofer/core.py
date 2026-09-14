@@ -69,18 +69,18 @@ def clear_location() -> None:
     _run("clear")
 
 
-def pick_on_map() -> tuple[float, float] | None:
-    """Opens the interactive map picker and returns the clicked (lat, lon),
-    or None if the user cancelled/closed it. Runs in a subprocess: a native
-    webview needs its own main thread on macOS, which the GUI's Tkinter
-    mainloop already occupies."""
-    result = subprocess.run(
-        [sys.executable, "-m", "geo_spoofer.map_picker"], capture_output=True, text=True
-    )
-    if result.returncode != 0 or not result.stdout.strip():
+def current_location() -> tuple[float, float] | None:
+    """Best-effort approximation of where you actually are, via free IP
+    geolocation (no device GPS readback exists -- pymobiledevice3 can only
+    set the simulated location, never read the real one back). City-level
+    accuracy at best. Returns None if the lookup fails."""
+    request = urllib.request.Request("https://ipapi.co/json/", headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=5) as response:
+            data = json.load(response)
+        return float(data["latitude"]), float(data["longitude"])
+    except (OSError, ValueError, KeyError, TypeError):
         return None
-    lat_str, lon_str = result.stdout.strip().split(",")
-    return float(lat_str), float(lon_str)
 
 
 def geocode(place: str) -> tuple[float, float]:
@@ -157,10 +157,13 @@ def route_to_gpx(points: list[tuple[float, float]], speed_kmh: float) -> str:
     return gpx.to_xml()
 
 
-def start_drive(start_text: str, end_text: str, speed_kmh: float = 40.0) -> subprocess.Popen:
+def start_drive(
+    start_text: str, end_text: str, speed_kmh: float = 40.0
+) -> tuple[subprocess.Popen, list[tuple[float, float]]]:
     """Looks up a road route between two places/coords and starts driving it.
     Keep the returned process alive for the drive; terminate it to stop
-    early and restore real GPS."""
+    early and restore real GPS. Also returns the route's points so callers
+    (e.g. the map view) can draw it without re-fetching."""
     start, end = resolve_point(start_text), resolve_point(end_text)
     points = osrm_route(start, end)
     gpx_xml = route_to_gpx(points, speed_kmh)
@@ -168,4 +171,4 @@ def start_drive(start_text: str, end_text: str, speed_kmh: float = 40.0) -> subp
     fd, path = tempfile.mkstemp(suffix=".gpx", prefix="geo-spoofer-")
     os.close(fd)
     Path(path).write_text(gpx_xml)
-    return subprocess.Popen(_cmd("play", path))
+    return subprocess.Popen(_cmd("play", path)), points
